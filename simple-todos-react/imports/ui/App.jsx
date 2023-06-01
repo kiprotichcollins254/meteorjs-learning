@@ -17,7 +17,8 @@ const toggleChecked = ({_id,isChecked}) => {
 const deleteTask = ({_id}) => TaskCollections.remove(_id)
 
 export const App = () => {
-  const user = useTracker(()=>Meteor.user())
+  const user = useTracker(()=>Meteor.user(),[])
+  const isLogged = Meteor.userId() !== null
   const [hideCompleted,setHideCompleted] = useState(false)
   const hideCompletedFilter = {isChecked:{$ne:true}}
   const userFilter = user ? {userId : user._id} : {}
@@ -47,7 +48,7 @@ export const App = () => {
 
   const logout = Meteor.logout();
 
-  console.log(user)
+  // console.log(user)
 
   return(
     <div className='app'>
@@ -62,7 +63,7 @@ export const App = () => {
         </header>
         
         <div className='main'>
-        { user ? (
+        { isLogged ? (
           <Fragment>
               <div className='user' onClick={logout}>
               {user.username}
