@@ -6,13 +6,22 @@ import { Task } from './Task.jsx';
 import { TaskForm } from './Tasks/TaskForm.jsx';
 import { LoginForm } from './Auth/LoginForm.jsx';
 
+const toggleChecked = ({_id,isChecked}) => {
+  TaskCollections.update(_id,{
+    $set:{
+      isChecked:!isChecked
+    }
+  })
+}
+
+const deleteTask = ({_id}) => TaskCollections.remove(_id)
 
 export const App = () => {
-  const [hideCompleted,setHideCompleted] = useState(false)
   const user = useTracker(()=>Meteor.user())
+  const [hideCompleted,setHideCompleted] = useState(false)
   const hideCompletedFilter = {isChecked:{$ne:true}}
   const userFilter = user ? {userId : user._id} : {}
-  const logout = Meteor.logout();
+  
   const pendingOnlyFilter = {...hideCompletedFilter,...userFilter}
 
 
@@ -27,45 +36,37 @@ export const App = () => {
     if(!user){
       return 0;
     }
-    return  TaskCollections.find(hideCompletedFilter).count()
+    return  TaskCollections.find(pendingOnlyFilter).count()
   })
 
   const pendingTaskTitle = `${
     pendingTasksCount ? `(${pendingTasksCount})` : ''
-  }
-   
-  `
+  }`
 
-  const toggleChecked = ({_id,isChecked}) => {
-    TaskCollections.update(_id,{
-      $set:{
-        isChecked:!isChecked
-      }
-    })
-  }
+  
 
-  const deleteTask = ({_id}) => {
-    TaskCollections.remove(_id)
-  }
+  const logout = Meteor.logout();
 
-  // console.log(user)
+  console.log(user)
 
   return(
     <div className='app'>
-    { user ? (
-    <Fragment>
+    
         <header>
           <div className='app-bar'>
             <div className='app-header'>
               <h1>Kip ToDo App {pendingTaskTitle}</h1>
             </div>
-            <div className='user' onClick={logout}>
-              {user.username}
-            </div>
+            
           </div>
         </header>
         
         <div className='main'>
+        { user ? (
+          <Fragment>
+              <div className='user' onClick={logout}>
+              {user.username}
+            </div>
           <TaskForm user={user} />
           <div className='filter'>
           <button onClick={()=>setHideCompleted(!hideCompleted)}>
@@ -82,11 +83,12 @@ export const App = () => {
             />
             )}
           </ul>
+          </Fragment>
+          ) : (
+            <LoginForm/>
+          )}
         </div>
-    </Fragment>
-      ) : (
-        <LoginForm/>
-      )}
+    
   </div>
   )
 };

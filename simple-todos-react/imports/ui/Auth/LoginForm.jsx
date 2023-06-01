@@ -1,5 +1,6 @@
 import {Meteor} from 'meteor/meteor'
 import React ,{useState} from 'react'
+import { LoginWithGithub } from './LoginWithGithub'
 
 
 export const LoginForm = () => {
@@ -14,6 +15,7 @@ export const LoginForm = () => {
     return(
         <div>
            <form onSubmit={submit} className='login-form'>
+             <LoginWithGithub />
              <label htmlFor="username">Username</label>
              <input type='text'  name='username' onChange={e=>setUsername(e.target.value)}/>
              <label htmlFor="password">Password</label>
